@@ -61,20 +61,19 @@ public class ExtraSteppingFilter : engine.ExtraSteppingFilter {
 
         if (sourcePosition == null) return false
 
-        val className = positionManager.classNameForPosition(sourcePosition)?.replace('/', '.')
+        val className = positionManager.classNameForPosition(sourcePosition)?.replace('/', '.') ?: return false
 
-        if (className != null) {
-            val settings = DebuggerSettings.getInstance()
-            if (settings.TRACING_FILTERS_ENABLED) {
-                for (filter in settings.getSteppingFilters()) {
-                    if (filter.isEnabled()) {
-                        if (filter.matches(className)) {
-                            return true;
-                        }
+        val settings = DebuggerSettings.getInstance()
+        if (settings.TRACING_FILTERS_ENABLED) {
+            for (filter in settings.getSteppingFilters()) {
+                if (filter.isEnabled()) {
+                    if (filter.matches(className)) {
+                        return true;
                     }
                 }
             }
         }
+
         return false;
     }
 
