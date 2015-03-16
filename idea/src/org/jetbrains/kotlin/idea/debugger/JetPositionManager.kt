@@ -436,36 +436,36 @@ public class JetPositionManager(private val myDebugProcess: DebugProcess) : Mult
     }
 
     private fun findInlinedCalls(element: PsiElement?, jetFile: PsiFile?): List<String> {
+        if (element == null || jetFile !is JetFile) {
+            return emptyList()
+        }
+
         return runReadAction {
-            var result = emptyList<String>()
-            if (element != null && jetFile is JetFile) {
-                val isInLibrary = LibraryUtil.findLibraryEntry(jetFile.getVirtualFile(), jetFile.getProject()) != null
-                val typeMapper = if (!isInLibrary) prepareTypeMapper(jetFile) else createTypeMapperForLibraryFile(element, jetFile)
-                val psiElement = getInternalClassNameForElement(element, typeMapper, jetFile, isInLibrary).element;
+            val result = arrayListOf<String>()
+            val isInLibrary = LibraryUtil.findLibraryEntry(jetFile.getVirtualFile(), jetFile.getProject()) != null
+            val typeMapper = if (!isInLibrary) prepareTypeMapper(jetFile) else createTypeMapperForLibraryFile(element, jetFile)
+            val psiElement = getInternalClassNameForElement(element, typeMapper, jetFile, isInLibrary).element;
 
-                if (psiElement is JetNamedFunction) {
-                    val descriptor = typeMapper.getBindingContext().get(BindingContext.DECLARATION_TO_DESCRIPTOR, psiElement)
-                    if (descriptor is SimpleFunctionDescriptor && descriptor.getInlineStrategy().isInline()) {
+            if (psiElement is JetNamedFunction) {
+                val descriptor = typeMapper.getBindingContext().get(BindingContext.DECLARATION_TO_DESCRIPTOR, psiElement)
 
-                        val project = myDebugProcess.getProject()
-                        val usagesSearchTarget = FindUsagesOptions(project).toSearchTarget(psiElement, true)
+                if (descriptor is SimpleFunctionDescriptor && descriptor.getInlineStrategy().isInline()) {
+                    val project = myDebugProcess.getProject()
+                    val usagesSearchTarget = FindUsagesOptions(project).toSearchTarget(psiElement, true)
 
-                        result = arrayListOf<String>()
-                        val usagesSearchRequest = DefaultSearchHelper<JetNamedFunction>(true).newRequest(usagesSearchTarget)
-                        usagesSearchRequest.search().forEach {
-                            val psiElement = it.getElement()
-                            if (psiElement is JetElement) {
-                                //TODO recursive search
-                                val name = classNameForPosition(psiElement)
-                                if (name != null) {
-                                    (result as MutableList<String>).add(name)
-                                }
+                    val usagesSearchRequest = DefaultSearchHelper<JetNamedFunction>(true).newRequest(usagesSearchTarget)
+                    usagesSearchRequest.search().forEach {
+                        val psiElement = it.getElement()
+                        if (psiElement is JetElement) {
+                            //TODO recursive search
+                            val name = classNameForPosition(psiElement)
+                            if (name != null) {
+                                result.add(name)
                             }
                         }
                     }
                 }
             }
-
             result
         }
     }
