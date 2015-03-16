@@ -255,19 +255,14 @@ public class JetPositionManager(private val myDebugProcess: DebugProcess) : Mult
         return myDebugProcess.getRequestsManager().createClassPrepareRequest(classPrepareRequestor, className.replace('/', '.'))
     }
 
-    override fun createPrepareRequests(classPrepareRequestor: ClassPrepareRequestor, sourcePosition: SourcePosition): MutableList<ClassPrepareRequest> {
-        if (sourcePosition.getFile() !is JetFile) {
+    override fun createPrepareRequests(requestor: ClassPrepareRequestor, position: SourcePosition): List<ClassPrepareRequest> {
+        if (position.getFile() !is JetFile) {
             throw NoDataException.INSTANCE
         }
-        val classNames = classNameForPositionAndInlinedOnes(sourcePosition)
-        if (classNames.isEmpty()) {
-            return Collections.emptyList()
+
+        return classNameForPositionAndInlinedOnes(position).map {
+            className -> myDebugProcess.getRequestsManager().createClassPrepareRequest(requestor, className.replace('/', '.'))
         }
-        val requests = arrayListOf<ClassPrepareRequest>()
-        for (className in classNames) {
-            requests.add(myDebugProcess.getRequestsManager().createClassPrepareRequest(classPrepareRequestor, className.replace('/', '.')))
-        }
-        return requests
     }
 
     TestOnly
@@ -354,12 +349,12 @@ public class JetPositionManager(private val myDebugProcess: DebugProcess) : Mult
         }
 
         private fun getElementToCalculateClassName(notPositionedElement: PsiElement?): JetElement? =
-            PsiTreeUtil.getParentOfType(notPositionedElement,
-                                        javaClass<JetClassOrObject>(),
-                                        javaClass<JetFunctionLiteral>(),
-                                        javaClass<JetNamedFunction>(),
-                                        javaClass<JetProperty>(),
-                                        javaClass<JetClassInitializer>())
+                PsiTreeUtil.getParentOfType(notPositionedElement,
+                                            javaClass<JetClassOrObject>(),
+                                            javaClass<JetFunctionLiteral>(),
+                                            javaClass<JetNamedFunction>(),
+                                            javaClass<JetProperty>(),
+                                            javaClass<JetClassInitializer>())
 
         public fun getJvmInternalNameForPropertyOwner(typeMapper: JetTypeMapper, descriptor: PropertyDescriptor): String {
             return typeMapper.mapOwner(
