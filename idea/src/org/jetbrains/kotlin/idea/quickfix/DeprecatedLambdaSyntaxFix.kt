@@ -51,7 +51,7 @@ public class DeprecatedLambdaSyntaxFix(element: JetFunctionLiteralExpression) : 
         LambdaWithDeprecatedSyntax(element).runFix(JetPsiFactory(project))
     }
 
-    default object Factory : JetSingleIntentionActionFactory() {
+    companion object Factory : JetSingleIntentionActionFactory() {
         override fun createAction(diagnostic: Diagnostic)
                 = (diagnostic.getPsiElement() as? JetFunctionLiteralExpression)?.let { DeprecatedLambdaSyntaxFix(it) }
     }
@@ -112,7 +112,7 @@ public class DeprecatedLambdaSyntaxInWholeProjectFix(element: JetFunctionLiteral
         }
     }
 
-    default object Factory : JetSingleIntentionActionFactory() {
+    companion object Factory : JetSingleIntentionActionFactory() {
         val LOG = Logger.getInstance(javaClass<DeprecatedLambdaSyntaxInWholeProjectFix>());
 
         override fun createAction(diagnostic: Diagnostic)
