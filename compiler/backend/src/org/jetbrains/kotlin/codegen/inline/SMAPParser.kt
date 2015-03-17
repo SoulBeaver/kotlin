@@ -25,10 +25,11 @@ object SMAPParser {
     /*null smap means that there is no any debug info in file (e.g. sourceName)*/
     public fun parseOrCreateDefault(mappingInfo: String?, source: String?, path: String, methodStartLine: Int, methodEndLine: Int): SMAP {
         if (mappingInfo == null || mappingInfo.isEmpty()) {
-            val fm : FileMapping
+            val fm: FileMapping
             if (source == null || source.isEmpty()) {
                 fm = FileMapping.SKIP
-            } else {
+            }
+            else {
                 fm = FileMapping(source, path)
                 if (methodStartLine <= methodEndLine) {
                     //one to one

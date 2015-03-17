@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.jvm.compiler;
 import com.google.common.collect.Iterables;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.analyzer.AnalysisResult;
@@ -38,11 +39,12 @@ import org.jetbrains.kotlin.test.*;
 import org.jetbrains.kotlin.test.util.DescriptorValidator;
 import org.jetbrains.kotlin.test.util.RecursiveDescriptorComparator;
 import org.jetbrains.kotlin.utils.UtilsPackage;
+import org.jetbrains.org.objectweb.asm.ClassReader;
+import org.jetbrains.org.objectweb.asm.ClassVisitor;
+import org.jetbrains.org.objectweb.asm.ClassWriter;
+import org.jetbrains.org.objectweb.asm.Opcodes;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -209,5 +211,60 @@ public class CompileKotlinAgainstCustomBinariesTest extends TestCaseWithTmpdir {
         String output = CliBaseTest.getNormalizedCompilerOutput(pair.first, pair.second, getTestDataDirectory().getPath());
 
         JetTestUtils.assertEqualsToFile(new File(getTestDataDirectory(), "output.txt"), output);
+    }
+
+    public void testInlineFunWithoutDebugInfo() throws Exception {
+        // This test compiles a Java library of two classes (Super and Sub), then deletes Super.class and attempts to compile a Kotlin
+        // source against this broken library. The expected result is an "incomplete hierarchy" error message from the compiler
+
+        File inlineSource = new File(getTestDataDirectory(), "sourceInline.kt");
+
+        Pair<String, ExitCode> pair = CliBaseTest.executeCompilerGrabOutput(new K2JVMCompiler(), Arrays.asList(
+                inlineSource.getPath(),
+                "-d", tmpdir.getPath()
+        ));
+
+        File inlineFunClass = new File(tmpdir.getAbsolutePath(), "test/A.class");
+        ClassReader reader = new ClassReader(new FileInputStream(inlineFunClass));
+        ClassWriter cw = new ClassWriter(Opcodes.ASM5);
+        reader.accept(new ClassVisitor(Opcodes.ASM5, cw) {
+            @Override
+            public void visitSource(String source, String debug) {
+                //skip debug info
+            }
+        }, 0);
+
+        inlineFunClass.delete();
+        assert !inlineFunClass.exists();
+
+        FileOutputStream stream = null;
+        try {
+            stream = new FileOutputStream(inlineFunClass);
+            stream.write(cw.toByteArray());
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+
+        File resultSource = new File(getTestDataDirectory(), "source.kt");
+        Pair<String, ExitCode> result = CliBaseTest.executeCompilerGrabOutput(new K2JVMCompiler(), Arrays.asList(
+                resultSource.getPath(),
+                "-classpath", tmpdir.getPath(),
+                "-d", tmpdir.getPath()
+        ));
+
+        File resiltFile = new File(tmpdir.getAbsolutePath(), "test/B.class");
+        reader = new ClassReader(new FileInputStream(resiltFile));
+        final Ref debugInfo = new Ref();
+        reader.accept(new ClassVisitor(Opcodes.ASM5) {
+            @Override
+            public void visitSource(String source, String debug) {
+                //skip debug info
+                debugInfo.set(debug);
+            }
+        }, 0);
+
+        assertEquals("SMAP", debugInfo.get());
     }
 }
