@@ -671,7 +671,6 @@ JetFile: FunctionLiterals.kt
           VALUE_PARAMETER_LIST
             VALUE_PARAMETER
               PsiElement(IDENTIFIER)('a')
-              PsiWhiteSpace(' ')
               PsiElement(COLON)(':')
               PsiWhiteSpace(' ')
               TYPE_REFERENCE
@@ -692,7 +691,6 @@ JetFile: FunctionLiterals.kt
           VALUE_PARAMETER_LIST
             VALUE_PARAMETER
               PsiElement(IDENTIFIER)('a')
-              PsiWhiteSpace(' ')
               PsiElement(COLON)(':')
               PsiWhiteSpace(' ')
               TYPE_REFERENCE
@@ -717,7 +715,6 @@ JetFile: FunctionLiterals.kt
           VALUE_PARAMETER_LIST
             VALUE_PARAMETER
               PsiElement(IDENTIFIER)('a')
-              PsiWhiteSpace(' ')
               PsiElement(COLON)(':')
               PsiWhiteSpace(' ')
               TYPE_REFERENCE
@@ -740,6 +737,74 @@ JetFile: FunctionLiterals.kt
           BLOCK
             REFERENCE_EXPRESSION
               PsiElement(IDENTIFIER)('f')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n\n    ')
+      FUNCTION_LITERAL_EXPRESSION
+        FUNCTION_LITERAL
+          PsiElement(LBRACE)('{')
+          BLOCK
+            BINARY_WITH_TYPE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('a')
+              OPERATION_REFERENCE
+                PsiElement(COLON)(':')
+              PsiWhiteSpace(' ')
+              TYPE_REFERENCE
+                FUNCTION_TYPE
+                  VALUE_PARAMETER_LIST
+                    PsiElement(LPAR)('(')
+                    VALUE_PARAMETER
+                      TYPE_REFERENCE
+                        USER_TYPE
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('Int')
+                    PsiErrorElement:Expecting comma or ')'
+                      <empty list>
+                    PsiWhiteSpace(' ')
+                    PsiErrorElement:Expecting ')'
+                      PsiElement(ARROW)('->')
+                  PsiErrorElement:Expecting '->' to specify return type of a function type
+                    <empty list>
+                  PsiWhiteSpace(' ')
+                  TYPE_REFERENCE
+                    USER_TYPE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('Unit')
+            PsiErrorElement:Unexpected tokens (use ';' to separate expressions on the same line)
+              PsiElement(RPAR)(')')
+              PsiWhiteSpace(' ')
+              PsiElement(ARROW)('->')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n    ')
+      FUNCTION_LITERAL_EXPRESSION
+        FUNCTION_LITERAL
+          PsiElement(LBRACE)('{')
+          BLOCK
+            BINARY_WITH_TYPE
+              ANNOTATED_EXPRESSION
+                ANNOTATION
+                  PsiElement(LBRACKET)('[')
+                  ANNOTATION_ENTRY
+                    CONSTRUCTOR_CALLEE
+                      TYPE_REFERENCE
+                        USER_TYPE
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('a')
+                  PsiElement(RBRACKET)(']')
+                PsiWhiteSpace(' ')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('a')
+              OPERATION_REFERENCE
+                PsiElement(COLON)(':')
+              PsiWhiteSpace(' ')
+              TYPE_REFERENCE
+                USER_TYPE
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('A')
+            PsiWhiteSpace(' ')
+            PsiErrorElement:Unexpected tokens (use ';' to separate expressions on the same line)
+              PsiElement(ARROW)('->')
+          PsiWhiteSpace(' ')
           PsiElement(RBRACE)('}')
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
