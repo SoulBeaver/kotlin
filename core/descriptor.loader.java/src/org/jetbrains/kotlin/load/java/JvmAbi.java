@@ -26,7 +26,7 @@ public final class JvmAbi {
      * This constant is used to identify binary format (class file) versions
      * If you change class file metadata format and/or naming conventions, please increase this number
      */
-    public static final int VERSION = 21;
+    public static final int VERSION = 22;
 
     public static final String TRAIT_IMPL_CLASS_NAME = "$TImpl";
     public static final String TRAIT_IMPL_SUFFIX = "$" + TRAIT_IMPL_CLASS_NAME;
@@ -47,7 +47,7 @@ public final class JvmAbi {
 
     //TODO: To be removed after kotlin M11
     @Deprecated
-    public static final String DEPRECATED_DEFAULT_OBJECT_FIELD = "OBJECT$";
+    public static final String DEPRECATED_COMPANION_OBJECT_FIELD = "OBJECT$";
 
     @NotNull
     public static String getSyntheticMethodNameForAnnotatedProperty(@NotNull Name propertyName) {
