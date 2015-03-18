@@ -26,6 +26,7 @@
           <element id="module-output" name="idea-jps-common" />
           <element id="module-output" name="preloader" />
           <element id="module-output" name="serialization" />
+          <element id="module-output" name="serialization.js" />
           <element id="module-output" name="serialization.jvm" />
           <element id="module-output" name="backend-common" />
           <element id="library" level="project" name="builtins" />
@@ -44,6 +45,7 @@
         <element id="directory" name="jps">
           <element id="artifact" artifact-name="KotlinJpsPlugin" />
         </element>
+        <element id="library" level="project" name="markdown" />
       </element>
       <element id="directory" name="kotlinc">
         <element id="dir-copy" path="$PROJECT_DIR$/dist/kotlinc" />
