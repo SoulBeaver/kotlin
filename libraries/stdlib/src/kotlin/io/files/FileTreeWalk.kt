@@ -28,7 +28,7 @@ class FileTreeWalk(private val start: File,
                    private val fail:  (f: File, e: IOException) -> Unit = { f, e -> Unit },
                    private val filter: (File) -> Boolean = { it -> true },
                    private val maxDepth: Int = Int.MAX_VALUE
-                   ): Stream<File> {
+                   ): Sequence<File> {
 
     private abstract class DirectoryState(val rootDir: File) {
         init {
