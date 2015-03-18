@@ -265,6 +265,16 @@ public class CompileKotlinAgainstCustomBinariesTest extends TestCaseWithTmpdir {
             }
         }, 0);
 
-        assertEquals("SMAP", debugInfo.get());
+        String expected = "SMAP\n" +
+                          "source.kt\n" +
+                          "Kotlin\n" +
+                          "*S Kotlin\n" +
+                          "*F\n" +
+                          "+ 1 source.kt\n" +
+                          "test/B\n" +
+                          "*L\n" +
+                          "1#1,13:1\n" +
+                          "*E\n";
+        assertEquals(expected, debugInfo.get());
     }
 }

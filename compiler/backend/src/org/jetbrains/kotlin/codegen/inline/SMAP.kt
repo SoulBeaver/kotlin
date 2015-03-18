@@ -358,7 +358,7 @@ data open public class RangeMapping(val source: Int, val dest: Int, var range: I
         }
     }
 
-    public object SKIP : RangeMapping(0, 0, Int.MAX_VALUE) {
+    public object SKIP : RangeMapping(-1, -1, 1) {
         override fun contains(destLine: Int): Boolean {
             return true
         }
