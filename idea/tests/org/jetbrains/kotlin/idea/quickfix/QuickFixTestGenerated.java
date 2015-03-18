@@ -2985,6 +2985,18 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
             doTest(fileName);
         }
 
+        @TestMetadata("beforeAddInitKeywordRemoveSemicolon.kt")
+        public void testAddInitKeywordRemoveSemicolon() throws Exception {
+            String fileName = JetTestUtils.navigationMetadata("idea/testData/quickfix/modifiers/beforeAddInitKeywordRemoveSemicolon.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("beforeAddInitKeywordRemoveSemicolonSameLine.kt")
+        public void testAddInitKeywordRemoveSemicolonSameLine() throws Exception {
+            String fileName = JetTestUtils.navigationMetadata("idea/testData/quickfix/modifiers/beforeAddInitKeywordRemoveSemicolonSameLine.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("beforeAddInitKeywordWithModifiers.kt")
         public void testAddInitKeywordWithModifiers() throws Exception {
             String fileName = JetTestUtils.navigationMetadata("idea/testData/quickfix/modifiers/beforeAddInitKeywordWithModifiers.kt");
@@ -3207,6 +3219,18 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
             @TestMetadata("beforeImplementTraitFinalSupertype.kt")
             public void testImplementTraitFinalSupertype() throws Exception {
                 String fileName = JetTestUtils.navigationMetadata("idea/testData/quickfix/modifiers/addOpenToClassDeclaration/beforeImplementTraitFinalSupertype.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("beforeSecondaryCtrDelegationInHeader.kt")
+            public void testSecondaryCtrDelegationInHeader() throws Exception {
+                String fileName = JetTestUtils.navigationMetadata("idea/testData/quickfix/modifiers/addOpenToClassDeclaration/beforeSecondaryCtrDelegationInHeader.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("beforeSecondaryCtrDelegationInSecondary.kt")
+            public void testSecondaryCtrDelegationInSecondary() throws Exception {
+                String fileName = JetTestUtils.navigationMetadata("idea/testData/quickfix/modifiers/addOpenToClassDeclaration/beforeSecondaryCtrDelegationInSecondary.kt");
                 doTest(fileName);
             }
 
