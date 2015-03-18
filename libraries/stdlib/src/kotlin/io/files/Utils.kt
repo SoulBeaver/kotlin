@@ -62,13 +62,13 @@ public val File.canonicalPath: String
     get() = getCanonicalPath()
 
 /**
- * @return the file name or "" for an empty name
+ * @return the file name
  */
 public val File.name: String
     get() = getName()
 
 /**
- * @return the file path or "" for an empty name
+ * @return the file path
  */
 public val File.path: String
     get() = getPath()
