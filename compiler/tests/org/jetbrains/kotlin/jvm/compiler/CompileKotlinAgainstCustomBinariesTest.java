@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollectorPlainTextToStrea
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler;
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles;
 import org.jetbrains.kotlin.cli.jvm.compiler.JetCoreEnvironment;
+import org.jetbrains.kotlin.codegen.inline.InlineCodegenUtil;
 import org.jetbrains.kotlin.config.CompilerConfiguration;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor;
@@ -272,6 +273,10 @@ public class CompileKotlinAgainstCustomBinariesTest extends TestCaseWithTmpdir {
                           "1#1,13:1\n" +
                           "*E\n";
 
-        assertEquals(expected, debugInfo.get());
+        if (InlineCodegenUtil.GENERATE_SMAP) {
+            assertEquals(expected, debugInfo.get());
+        } else {
+            assertEquals(null, debugInfo.get());
+        }
     }
 }
