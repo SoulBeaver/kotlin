@@ -224,7 +224,7 @@ public class CompileKotlinAgainstCustomBinariesTest extends TestCaseWithTmpdir {
                 "-d", tmpdir.getPath()
         ));
 
-        File inlineFunClass = new File(tmpdir.getAbsolutePath(), "test/A.class");
+        File inlineFunClass = new File(tmpdir.getAbsolutePath(), "/test/A.class");
         ClassReader reader = new ClassReader(new FileInputStream(inlineFunClass));
         ClassWriter cw = new ClassWriter(Opcodes.ASM5);
         reader.accept(new ClassVisitor(Opcodes.ASM5, cw) {
