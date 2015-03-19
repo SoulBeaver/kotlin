@@ -66,7 +66,6 @@ public class BuiltInsReferenceResolver extends AbstractProjectComponent {
 
     private volatile ModuleDescriptor moduleDescriptor;
     private volatile Set<JetFile> builtInsSources;
-    private volatile PackageFragmentDescriptor builtinsPackageFragment;
 
     public BuiltInsReferenceResolver(Project project) {
         super(project);
@@ -114,15 +113,11 @@ public class BuiltInsReferenceResolver extends AbstractProjectComponent {
                 module.initialize(injectorForLazyResolve.getResolveSession().getPackageFragmentProvider());
 
                 if (!ApplicationManager.getApplication().isUnitTestMode()) {
-                    // Use lazy initialization in tests
+                    // Use lazy initialization in tests. Fully initialize in production to avoid synchronization problems.
                     injectorForLazyResolve.getResolveSession().forceResolveAll();
                 }
 
-                List<PackageFragmentDescriptor> fragments =
-                        module.getPackageFragmentProvider().getPackageFragments(KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME);
-
                 moduleDescriptor = module;
-                builtinsPackageFragment = KotlinPackage.single(fragments);
                 builtInsSources = Sets.newHashSet(jetBuiltInsFiles);
             }
         };
@@ -216,7 +211,7 @@ public class BuiltInsReferenceResolver extends AbstractProjectComponent {
         else if (originalDescriptor instanceof PackageFragmentDescriptor) {
             return isFromBuiltinModule(originalDescriptor)
                    && KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME.equals(((PackageFragmentDescriptor) originalDescriptor).getFqName())
-                   ? builtinsPackageFragment
+                   ? KotlinPackage.single(moduleDescriptor.getPackageFragmentProvider().getPackageFragments(KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME))
                    : null;
         }
         else if (originalDescriptor instanceof MemberDescriptor) {
