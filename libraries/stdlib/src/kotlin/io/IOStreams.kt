@@ -4,15 +4,40 @@ import java.io.*
 import java.nio.charset.Charset
 import java.nio.charset.CharsetDecoder
 import java.nio.charset.CharsetEncoder
-
-// Note: hasNext() is incorrect because available() means "number of available bytes WITHOUT BLOCKING"
+import java.util.NoSuchElementException
 
 /** Returns an [Iterator] of bytes in this input stream. */
+deprecated("It's not recommended to iterate through input stream bytes")
 public fun InputStream.iterator(): ByteIterator =
         object : ByteIterator() {
-            override fun hasNext(): Boolean = available() > 0
 
-            public override fun nextByte(): Byte = read().toByte()
+            var nextByte = -1
+
+            var nextPrepared = false
+
+            var finished = false
+
+            private fun prepareNext() {
+                if (!nextPrepared && !finished) {
+                    nextByte = read()
+                    nextPrepared = true
+                    finished = (nextByte == -1)
+                }
+            }
+
+            public override fun hasNext(): Boolean {
+                prepareNext()
+                return !finished
+            }
+
+            public override fun nextByte(): Byte {
+                prepareNext()
+                if (finished)
+                    throw NoSuchElementException("Input stream is over")
+                val res = nextByte.toByte()
+                nextPrepared = false
+                return res
+            }
         }
 
 /**
@@ -83,7 +108,7 @@ public fun InputStream.copyTo(out: OutputStream, bufferSize: Int = defaultBuffer
  */
 public fun InputStream.readBytes(estimatedSize: Int = defaultBufferSize): ByteArray {
     val buffer = ByteArrayOutputStream(estimatedSize)
-    this.copyTo(buffer)
+    copyTo(buffer)
     return buffer.toByteArray()
 }
 

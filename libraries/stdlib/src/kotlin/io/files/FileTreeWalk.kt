@@ -13,7 +13,12 @@ import java.util.Stack
  * An alternative version of file walker
  */
 
-enum class FileWalkDirection {
+/**
+ * An enumeration to describe possible walk directions.
+ * There are two of them: beginning from parents, ending with children,
+ * and beginning from children, ending with parents. Both use depth-first search.
+ */
+public enum class FileWalkDirection {
     /** Depth-first search, directory is visited BEFORE its files */
     TOP_DOWN
     /** Depth-first search, directory is visited AFTER its files */
@@ -21,14 +26,17 @@ enum class FileWalkDirection {
     // Do we want also breadth-first search?
 }
 
-class FileTreeWalk(private val start: File,
+/**
+ * This class is intended to implement different file walk methods
+ */
+public class FileTreeWalk(private val start: File,
                    private val direction: FileWalkDirection = FileWalkDirection.TOP_DOWN,
                    private val enter: (File) -> Unit = {},
                    private val leave: (File) -> Unit = {},
-                   private val fail:  (f: File, e: IOException) -> Unit = { f, e -> Unit },
-                   private val filter: (File) -> Boolean = { it -> true },
+                   private val fail: (f: File, e: IOException) -> Unit = {(f, e) -> Unit},
+                   private val filter: (File) -> Boolean = { true },
                    private val maxDepth: Int = Int.MAX_VALUE
-                   ): Sequence<File> {
+) : Sequence<File> {
 
     private abstract class DirectoryState(val rootDir: File) {
         init {
@@ -38,7 +46,7 @@ class FileTreeWalk(private val start: File,
         abstract public fun step(): File?
     }
 
-    private inner class BottomUpDirectoryState(rootDir: File): DirectoryState(rootDir) {
+    private inner class BottomUpDirectoryState(rootDir: File) : DirectoryState(rootDir) {
 
         private var rootVisited = false
 
@@ -72,7 +80,7 @@ class FileTreeWalk(private val start: File,
         }
     }
 
-    private inner class TopDownDirectoryState(rootDir: File): DirectoryState(rootDir) {
+    private inner class TopDownDirectoryState(rootDir: File) : DirectoryState(rootDir) {
 
         private var rootVisited = false
 
@@ -133,6 +141,7 @@ class FileTreeWalk(private val start: File,
         })
     }
 
+    tailRecursive
     private fun gotoNext(): File? {
         if (end) {
             // We are already at the end
@@ -210,12 +219,13 @@ class FileTreeWalk(private val start: File,
         return FileTreeWalk(start, direction, enter, leave, fail, filter, depth)
     }
 
-    private val it = object: Iterator<File> {
+    private val it = object : Iterator<File> {
         override fun hasNext(): Boolean {
             if (nextFile == null)
                 nextFile = gotoNext()
             return (nextFile != null)
         }
+
         override fun next(): File {
             if (nextFile == null)
                 nextFile = gotoNext()
@@ -229,22 +239,27 @@ class FileTreeWalk(private val start: File,
         }
     }
 
-    override fun iterator(): Iterator<File> {
+    override public fun iterator(): Iterator<File> {
         return it
     }
 }
 
-fun File.walk(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): FileTreeWalk =
+/**
+ * Gets a sequence for visiting this directory and all its content.
+ *
+ * @param direction walk direction, top-down (by default) or bottom-up
+ */
+public fun File.walk(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): FileTreeWalk =
         FileTreeWalk(this, direction)
 
 /**
- * Gets a stream for visiting this directory and all its content in top-down order.
+ * Gets a sequence for visiting this directory and all its content in top-down order.
  * Depth-first search is used and directories are visited before all their files
  */
 public fun File.walkTopDown(): FileTreeWalk = walk(FileWalkDirection.TOP_DOWN)
 
 /**
- * Gets a stream for visiting this directory and all its content in bottom-up order.
+ * Gets a sequence for visiting this directory and all its content in bottom-up order.
  * Depth-first search is used and directories are visited after all their files
  */
 public fun File.walkBottomUp(): FileTreeWalk = walk(FileWalkDirection.BOTTOM_UP)
