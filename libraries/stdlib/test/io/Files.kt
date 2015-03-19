@@ -8,8 +8,8 @@ import java.io.FileNotFoundException
 import java.util.NoSuchElementException
 import java.util.HashSet
 import java.util.ArrayList
-import kotlin.io.files.walkBottomUp
-import kotlin.io.files.walkTopDown
+import kotlin.io.walkBottomUp
+import kotlin.io.walkTopDown
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -515,6 +515,13 @@ class FilesTest {
                 dir.walkTopDown()
                 assert(false)
             } catch(e: FileNotFoundException) {}
+        }
+
+        test fun recurse() {
+            val set: MutableSet<String> = HashSet()
+            val dir = createTestFiles()
+            dir.recurse { set.add(it.path) }
+            assertEquals(10, set.size())
         }
     }
 

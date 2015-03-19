@@ -1,4 +1,4 @@
-package kotlin.io.files
+package kotlin.io
 
 import java.io.File
 import java.io.FileNotFoundException
@@ -249,3 +249,13 @@ public fun File.walkTopDown(): FileTreeWalk = walk(FileWalkDirection.TOP_DOWN)
  */
 public fun File.walkBottomUp(): FileTreeWalk = walk(FileWalkDirection.BOTTOM_UP)
 
+/**
+ * Recursively process this file and all children with the given block.
+ * Note that if this file doesn't exist, then the block will be executed on it anyway.
+ *
+ * @param block the function to call on each file
+ */
+deprecated("It's recommended to use walkTopDown() / walkBottomUp()")
+public fun File.recurse(block: (File) -> Unit): Unit {
+    walkTopDown().forEach { block(it) }
+}
