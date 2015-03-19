@@ -1,10 +1,8 @@
 package test.io
 
+import java.io.*
 import org.junit.Test as test
 import kotlin.test.assertEquals
-import java.io.File
-import java.io.IOException
-import java.io.FileNotFoundException
 import java.util.NoSuchElementException
 import java.util.HashSet
 import java.util.ArrayList
@@ -840,5 +838,29 @@ class FilesTest {
             src.deleteRecursively()
             dst.deleteRecursively()
         }
+    }
+
+    test fun helpers1() {
+        val str = "123456789\n"
+        System.setIn(str.inputStream())
+        val reader = System.`in`.bufferedReader()
+        assertEquals("123456789", reader.readLine())
+        val stringReader = str.reader()
+        assertEquals('1', stringReader.read().toChar())
+        assertEquals('2', stringReader.read().toChar())
+        assertEquals('3', stringReader.read().toChar())
+    }
+
+    test fun helpers2() {
+        val file = createTempFile()
+        val writer = file.printWriter()
+        val str1 = "Hello, world!"
+        val str2 = "Everything is wonderful!"
+        writer.println(str1)
+        writer.println(str2)
+        writer.close()
+        val reader = file.bufferedReader()
+        assertEquals(str1, reader.readLine())
+        assertEquals(str2, reader.readLine())
     }
 }

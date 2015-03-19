@@ -28,11 +28,20 @@ else
 /** Creates a reader on this input stream using UTF-8 or the specified [charset]. */
 public fun InputStream.reader(charset: Charset = Charsets.UTF_8): InputStreamReader = InputStreamReader(this, charset)
 
+/** Creates a buffered reader on this input stream using UTF-8 or the specified [charset]. */
+public fun InputStream.bufferedReader(charset: Charset = Charsets.UTF_8): BufferedReader = reader(charset).buffered()
+
 /** Creates a reader on this input stream using the specified [charset]. */
 public fun InputStream.reader(charset: String): InputStreamReader = InputStreamReader(this, charset)
 
+/** Creates a buffered reader on this input stream using the specified [charset]. */
+public fun InputStream.bufferedReader(charset: String): BufferedReader = reader(charset).buffered()
+
 /** Creates a reader on this input stream using the specified [decoder]. */
 public fun InputStream.reader(decoder: CharsetDecoder): InputStreamReader = InputStreamReader(this, decoder)
+
+/** Creates a reader on this input stream using the specified [decoder]. */
+public fun InputStream.bufferedReader(decoder: CharsetDecoder): BufferedReader = reader(decoder).buffered()
 
 /**
  * Creates a buffered output stream wrapping this stream.

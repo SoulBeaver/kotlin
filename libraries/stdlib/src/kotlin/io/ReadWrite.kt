@@ -12,6 +12,28 @@ import java.util.NoSuchElementException
 public fun File.reader(): FileReader = FileReader(this)
 
 /**
+ * @param bufferSize necessary size of the buffer
+ * @return a new [BufferedReader] for reading the contents of this file.
+ */
+public fun File.bufferedReader(bufferSize: Int = defaultBufferSize): BufferedReader = reader().buffered(bufferSize)
+
+/**
+ * @return a new [FileWriter] for writing the contents of this file.
+ */
+public fun File.writer(): FileWriter = FileWriter(this)
+
+/**
+ * @param bufferSize necessary size of the buffer
+ * @return a new [BufferedWriter] for writing the contents of this file.
+ */
+public fun File.bufferedWriter(bufferSize: Int = defaultBufferSize): BufferedWriter = writer().buffered(bufferSize)
+
+/**
+ * @return a new [PrintWriter] for writing the contents of this file.
+ */
+public fun File.printWriter(): PrintWriter = PrintWriter(writer().buffered())
+
+/**
  * Reads the entire content of this file as a byte array.
  *
  * This method is not recommended on huge files. It has an internal limitation of 2 GB byte array size

@@ -1,6 +1,7 @@
 package kotlin.io
 
 import java.io.*
+import java.nio.charset.Charset
 import java.util.ArrayList
 
 /**
@@ -109,6 +110,11 @@ public fun String.pathSeparatorsToSystem(): String {
 public fun String.allSeparatorsToSystem(): String {
     return separatorsToSystem().pathSeparatorsToSystem()
 }
+
+/** Creates a new reader for the string */
+public fun String.reader(): StringReader = StringReader(this)
+
+public fun String.inputStream(charset: Charset = Charsets.UTF_8): InputStream = ByteArrayInputStream(this.toByteArray(charset))
 
 /**
  * Returns a pathname of this file with all path separators replaced with File.pathSeparator
