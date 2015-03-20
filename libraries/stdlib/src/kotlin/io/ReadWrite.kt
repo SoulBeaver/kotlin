@@ -284,12 +284,12 @@ deprecated("Use lines() function which returns Sequence<String>")
 public fun BufferedReader.lineIterator(): Iterator<String> = lines().iterator()
 
 private class LinesStream(private val reader: BufferedReader) : Sequence<String> {
-    override fun iterator(): Iterator<String> {
+    override public fun iterator(): Iterator<String> {
         return object : Iterator<String> {
             private var nextValue: String? = null
             private var done = false
 
-            override fun hasNext(): Boolean {
+            override public fun hasNext(): Boolean {
                 if (nextValue == null && !done) {
                     nextValue = reader.readLine()
                     if (nextValue == null) done = true
@@ -297,7 +297,7 @@ private class LinesStream(private val reader: BufferedReader) : Sequence<String>
                 return nextValue != null
             }
 
-            public override fun next(): String {
+            override public fun next(): String {
                 if (!hasNext()) {
                     throw NoSuchElementException()
                 }

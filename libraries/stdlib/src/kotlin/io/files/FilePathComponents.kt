@@ -3,7 +3,7 @@ package kotlin.io
 import java.io.File
 import java.util.NoSuchElementException
 
-fun String.getRootName(): String {
+private fun String.getRootName(): String {
     // Note: separators should be already replaced to system ones
     var first = indexOf(File.separatorChar, 0)
     if (first == 0) {

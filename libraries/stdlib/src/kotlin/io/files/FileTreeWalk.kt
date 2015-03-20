@@ -41,7 +41,7 @@ public class FileTreeWalk(private val start: File,
                    private val maxDepth: Int = Int.MAX_VALUE
 ) : Sequence<File> {
 
-    private abstract class DirectoryState(val rootDir: File) {
+    private abstract class DirectoryState(public val rootDir: File) {
         init {
             if (!rootDir.isDirectory())
                 throw IllegalArgumentException("Directory is needed")
@@ -222,13 +222,13 @@ public class FileTreeWalk(private val start: File,
     }
 
     private val it = object : Iterator<File> {
-        override fun hasNext(): Boolean {
+        override public fun hasNext(): Boolean {
             if (nextFile == null)
                 nextFile = gotoNext()
             return (nextFile != null)
         }
 
-        override fun next(): File {
+        override public fun next(): File {
             if (nextFile == null)
                 nextFile = gotoNext()
             val res = nextFile
