@@ -607,8 +607,8 @@ class FilesTest {
     private fun checkFileElements(f: File, root: File?, elements: List<String>) {
         var i = 0
         assertEquals(root, f.root)
-        for (elem in f) {
-            assertTrue(i < elements.size())
+        for (elem in f.filePathComponents().fileList) {
+            assertTrue(i < elements.size(), i.toString())
             assertEquals(elements[i++], elem.toString())
         }
         assertEquals(elements.size(), i)

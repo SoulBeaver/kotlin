@@ -141,43 +141,29 @@ public val File.nameWithoutExtension: String
  */
 public fun File.relativeTo(base: File): String {
     // Check roots
-    if (root != base.root)
+    val components = filePathComponents()
+    val baseComponents = base.filePathComponents()
+    if (components.rootName != base.rootName)
         throw IllegalArgumentException("this and base files have different roots")
-    var it = iterator()
-    var baseIt = base.iterator()
-    var same = true
-    var sameComponents = 0
-    var baseComponents = 0
-    // Determine number of same components for this and base
-    // and total number of components for base
-    while (baseIt.hasNext()) {
-        baseComponents++
-        val baseName = baseIt.next()
-        if (same && it.hasNext()) {
-            if (it.next() == baseName) {
-                sameComponents++
-            } else {
-                same = false
-            }
-        } else {
-            same = false
-        }
-    }
+    var i = 0
+    while (i < components.size && i < baseComponents.size && components.fileList[i] == baseComponents.fileList[i])
+        i++
+    val sameCount = i
+    val baseCount = baseComponents.size
     // Add all ..
     var res = ""
-    for (i in sameComponents + 1..baseComponents - 1)
+    for (j in sameCount + 1..baseCount - 1)
         res += (".." + File.separator)
-    val components = nameCount
     // If .. is the last element, no separator should present
-    if (baseComponents > sameComponents) {
-        res += if (sameComponents < components) ".." + File.separator else ".."
+    if (baseCount > sameCount) {
+        res += if (sameCount < components.size) ".." + File.separator else ".."
     }
     // Add remaining this components
-    if (sameComponents < components - 1)
-        res += (subPath(sameComponents, components - 1).toString() + File.separator)
+    if (sameCount < components.size - 1)
+        res += (components.subPath(sameCount, components.size - 1).toString() + File.separator)
     // The last one should be without separator
-    if (sameComponents < components)
-        res += subPath(components - 1, components).toString()
+    if (sameCount < components.size)
+        res += components.subPath(components.size - 1, components.size).toString()
     return res
 }
 
@@ -332,12 +318,6 @@ public fun File.listFiles(filter: (file: File) -> Boolean): Array<File>? = listF
 )
 
 /**
- * Returns an iterator to go through pathname components, e.g.
- * /foo/bar/gav has components foo, bar and gav
- */
-public fun File.iterator(): Iterator<File> = FilePathComponentIterator(this)
-
-/**
  * Determines whether this file belongs to the same root as [o]
  * and starts with all components of [o] in the same order.
  * So if [o] has N components, first N components of `this` must be the same as in [o].
@@ -346,22 +326,14 @@ public fun File.iterator(): Iterator<File> = FilePathComponentIterator(this)
  * @return true if this path starts with [o] path, false otherwise
  */
 public fun File.startsWith(o: File): Boolean {
-    val it = FilePathComponentIterator(this)
-    val otherIt = FilePathComponentIterator(o)
-    // Roots must be same OR other path can have no root
-    if (it.root != otherIt.root && otherIt.root != "")
+    val components = filePathComponents()
+    val otherComponents = o.filePathComponents()
+    if (components.rootName != otherComponents.rootName && otherComponents.rootName != "")
         return false
-    // Other path is empty
-    if (!otherIt.hasNext())
-        return true
-    val count = nameCount
-    val otherCount = o.nameCount
-    // This path is shorted than the other
-    if (count < otherCount)
+    if (components.size < otherComponents.size)
         return false
-    // Compare first elements until other ends
-    while (otherIt.hasNext()) {
-        if (it.next() != otherIt.next())
+    for (i in 0..otherComponents.size-1) {
+        if (components.fileList[i] != otherComponents.fileList[i])
             return false
     }
     return true
@@ -386,32 +358,17 @@ public fun File.startsWith(o: String): Boolean = startsWith(File(o))
  * @return true if this path ends with [o] path, false otherwise
  */
 public fun File.endsWith(o: File): Boolean {
-    val it = FilePathComponentIterator(this)
-    val otherIt = FilePathComponentIterator(o)
-    // Roots must be same OR other path can have no root
-    if (it.root != otherIt.root && otherIt.root != "")
+    val components = filePathComponents()
+    val otherComponents = o.filePathComponents()
+    if (components.rootName != otherComponents.rootName && otherComponents.rootName != "")
         return false
-    // Other path is empty
-    if (!otherIt.hasNext())
-        return true
-    var theirs = otherIt.next()
-    val count = nameCount
-    val otherCount = o.nameCount
-    // This path is shorted than the other
-    if (count < otherCount)
+    val shift = components.size - otherComponents.size
+    if (shift < 0)
         return false
-    var ours = it.next()
-    // Move forward to have same number of elements remaining
-    for (i in 0..count - otherCount - 1) {
-        ours = it.next()
+    for (i in 0..otherComponents.size-1) {
+        if (components.fileList[i + shift] != otherComponents.fileList[i])
+            return false
     }
-    // Check all next elements are same, until the end
-    while (ours == theirs && it.hasNext() && otherIt.hasNext()) {
-        ours = it.next()
-        theirs = otherIt.next()
-    }
-    if (ours != theirs || it.hasNext() || otherIt.hasNext())
-        return false
     return true
 }
 
@@ -432,11 +389,9 @@ public fun File.endsWith(o: String): Boolean = endsWith(File(o))
  * @return normalized pathname with . and possibly .. removed
  */
 public fun File.normalize(): File {
-    val rootName = rootName
-    val list: MutableList<String> = ArrayList()
-    for (elem in this)
-        if (elem.toString() != ".")
-            list.add(elem.toString())
+    val components = filePathComponents()
+    val rootName = components.rootName
+    val list: MutableList<String> = components.fileList.filter{ it.toString() != "." }.map{ it.toString() }.toLinkedList()
     var first = 0
     var dots = list.subList(first, list.size()).indexOf("..")
     while (dots != -1) {
@@ -472,10 +427,7 @@ public fun File.resolve(o: File): File {
     if (o.root != null)
         return o
     val ourName = toString()
-    if (ourName.endsWith(File.separatorChar))
-        return File(ourName + o)
-    else
-        return File(ourName + File.separatorChar + o)
+    return if (ourName.endsWith(File.separatorChar)) File(ourName + o) else File(ourName + File.separatorChar + o)
 }
 
 /**
@@ -496,10 +448,7 @@ public fun File.resolve(o: String): File = resolve(File(o))
  */
 public fun File.resolveSibling(o: File): File {
     val parentFile = parent
-    if (parentFile != null)
-        return parentFile.resolve(o)
-    else
-        return o
+    return if (parentFile != null) parentFile.resolve(o) else o
 }
 
 /**
