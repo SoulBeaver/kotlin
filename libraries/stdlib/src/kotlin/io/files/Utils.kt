@@ -279,45 +279,34 @@ public fun File.copyRecursively(dst: File,
                                 onError: (File, IOException) -> OnErrorAction =
                                 { file, e -> throw e }
 ): Boolean {
-    fun copy(src: File): OnErrorAction? {
+    if (!exists()) {
+        return onError(this, NoSuchFileException(file = this, reason = "The source file doesn't exist")) !=
+                OnErrorAction.TERMINATE
+    }
+    for (src in walkTopDown()) {
         if (!src.exists()) {
-            return onError(this, NoSuchFileException(file = this, reason = "The source file doesn't exist"))
-        }
-        val relPath = src.relativeTo(this@copyRecursively)
-        val dstFile = File(dst, relPath)
-        if (dstFile.exists() && !(src.isDirectory() && dstFile.isDirectory())) {
-            return onError(dstFile, FileAlreadyExistsException(file = src,
-                    other = dstFile,
-                    reason = "The destination file already exists"))
-        }
-        try {
-            if (src.isDirectory()) {
+            if (onError(src, NoSuchFileException(file = src, reason = "The source file doesn't exist")) ==
+                    OnErrorAction.TERMINATE)
+                return false
+        } else {
+            val relPath = src.relativeTo(this)
+            val dstFile = File(dst, relPath)
+            if (dstFile.exists() && !(src.isDirectory() && dstFile.isDirectory())) {
+                if (onError(dstFile, FileAlreadyExistsException(file = src,
+                        other = dstFile,
+                        reason = "The destination file already exists")) == OnErrorAction.TERMINATE)
+                    return false
+            } else if (src.isDirectory()) {
                 dstFile.mkdirs()
-                val children = src.listFiles()
-                if (children == null) {
-                    return onError(src, AccessDeniedException(file = src,
-                            reason = "Cannot list files in a directory"))
-                }
-                for (child in children) {
-                    val result = copy(child)
-                    if (result == OnErrorAction.TERMINATE) {
-                        return result
-                    }
-                }
             } else {
                 if (src.copyTo(dstFile, true) != src.length()) {
-                    return onError(src, IOException("src.length() != dst.length()"))
+                    if (onError(src, IOException("src.length() != dst.length()")) == OnErrorAction.TERMINATE)
+                        return false
                 }
             }
-        } catch (e: IOException) {
-            return onError(src, e)
         }
-        return null
     }
-
-    val result = copy(this)
-
-    return result != OnErrorAction.TERMINATE
+    return true
 }
 
 /**
@@ -327,10 +316,9 @@ public fun File.copyRecursively(dst: File,
  * @return true if the file or directory is successfully deleted, false otherwise.
  */
 public fun File.deleteRecursively(): Boolean {
-    if (isDirectory()) {
-        listFiles()?.forEach { it.deleteRecursively() }
-    }
-    return delete()
+    var result = exists()
+    walkBottomUp().forEach { println(it.canonicalPath); if (!it.delete()) result = false }
+    return result
 }
 
 /**

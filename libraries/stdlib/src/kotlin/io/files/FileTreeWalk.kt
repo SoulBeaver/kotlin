@@ -27,13 +27,16 @@ public enum class FileWalkDirection {
 }
 
 /**
- * This class is intended to implement different file walk methods
+ * This class is intended to implement different file walk methods.
+ * It allows to iterate through all files inside [start] directory.
+ * If [start] is just a file, walker iterates only it.
+ * If [start] does not exist, walker does not do any iterations at all.
  */
 public class FileTreeWalk(private val start: File,
                    private val direction: FileWalkDirection = FileWalkDirection.TOP_DOWN,
                    private val enter: (File) -> Unit = {},
                    private val leave: (File) -> Unit = {},
-                   private val fail: (f: File, e: IOException) -> Unit = {(f, e) -> Unit},
+                   private val fail: (f: File, e: IOException) -> Unit = {f, e -> Unit},
                    private val filter: (File) -> Boolean = { true },
                    private val maxDepth: Int = Int.MAX_VALUE
 ) : Sequence<File> {
@@ -127,9 +130,8 @@ public class FileTreeWalk(private val start: File,
 
     init {
         if (!start.exists()) {
-            throw FileNotFoundException("The start file doesn't exist: $start")
-        }
-        if (start.isDirectory() && filter(start)) {
+            end = true
+        } else if (start.isDirectory() && filter(start)) {
             pushState(start)
         }
     }
@@ -150,7 +152,7 @@ public class FileTreeWalk(private val start: File,
             // There is nothing in the state
             // We must visit "start" if it's a file and matches the filter
             end = true
-            return if (!start.isDirectory() && filter(start)) start else null
+            return if (start.exists() && !start.isDirectory() && filter(start)) start else null
         }
         // Take next file from the top of the stack
         val topState = state.peek()

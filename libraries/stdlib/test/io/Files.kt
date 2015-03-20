@@ -307,7 +307,7 @@ class FilesTest {
         test fun withReduce() {
             val basedir = createTestFiles()
             try {
-                val res = basedir.walkTopDown().reduce {(a, b) -> if (a.canonicalPath > b.canonicalPath) a else b }
+                val res = basedir.walkTopDown().reduce {a, b -> if (a.canonicalPath > b.canonicalPath) a else b }
                 assertTrue(res.endsWith("9.txt"), "Expected end with 9.txt actual: ${res.name}")
             } finally {
                 basedir.deleteRecursively()
@@ -517,11 +517,6 @@ class FilesTest {
             } catch(e: NoSuchElementException) {
             } finally {
                 dir.delete()
-            }
-            try {
-                dir.walkTopDown()
-                assert(false)
-            } catch(e: FileNotFoundException) {
             }
         }
 
@@ -820,7 +815,7 @@ class FilesTest {
 
             var conflicts = 0
             src.copyRecursively(dst) {
-                (file: File, e: IOException) ->
+                file: File, e: IOException ->
                 if (e is FileAlreadyExistsException) {
                     conflicts++
                     OnErrorAction.SKIP
@@ -835,7 +830,7 @@ class FilesTest {
                     dst.deleteRecursively()
                     var caught = false
                     assert(src.copyRecursively(dst) {
-                        (file: File, e: IOException) ->
+                        file: File, e: IOException ->
                         if (e is AccessDeniedException) {
                             caught = true
                             OnErrorAction.SKIP
@@ -859,7 +854,7 @@ class FilesTest {
             }
 
             assert(!src.copyRecursively(dst) {
-                (file: File, e: IOException) ->
+                file: File, e: IOException ->
                 OnErrorAction.TERMINATE
             })
         } finally {
