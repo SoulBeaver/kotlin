@@ -53,7 +53,7 @@ public val File.root: File?
  * Iterates over elements of file, e.g. for /foo/bar/gav
  * we will have foo, bar and gav
  */
-public class FileIterator(val f: File) : Iterator<File> {
+public class FilePathComponentIterator(val f: File) : Iterator<File> {
 
     private val path = f.separatorsToSystem()
 

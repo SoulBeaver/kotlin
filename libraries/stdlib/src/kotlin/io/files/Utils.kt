@@ -277,7 +277,7 @@ public enum class OnErrorAction {
  */
 public fun File.copyRecursively(dst: File,
                                 onError: (File, IOException) -> OnErrorAction =
-                                {(file, e) -> throw e }
+                                { file, e -> throw e }
 ): Boolean {
     fun copy(src: File): OnErrorAction? {
         if (!src.exists()) {
@@ -347,7 +347,7 @@ public fun File.listFiles(filter: (file: File) -> Boolean): Array<File>? = listF
  * Returns an iterator to go through pathname components, e.g.
  * /foo/bar/gav has components foo, bar and gav
  */
-public fun File.iterator(): Iterator<File> = FileIterator(this)
+public fun File.iterator(): Iterator<File> = FilePathComponentIterator(this)
 
 /**
  * Determines whether this file belongs to the same root as [o]
@@ -358,8 +358,8 @@ public fun File.iterator(): Iterator<File> = FileIterator(this)
  * @return true if this path starts with [o] path, false otherwise
  */
 public fun File.startsWith(o: File): Boolean {
-    val it = FileIterator(this)
-    val otherIt = FileIterator(o)
+    val it = FilePathComponentIterator(this)
+    val otherIt = FilePathComponentIterator(o)
     // Roots must be same OR other path can have no root
     if (it.root != otherIt.root && otherIt.root != "")
         return false
@@ -398,8 +398,8 @@ public fun File.startsWith(o: String): Boolean = startsWith(File(o))
  * @return true if this path ends with [o] path, false otherwise
  */
 public fun File.endsWith(o: File): Boolean {
-    val it = FileIterator(this)
-    val otherIt = FileIterator(o)
+    val it = FilePathComponentIterator(this)
+    val otherIt = FilePathComponentIterator(o)
     // Roots must be same OR other path can have no root
     if (it.root != otherIt.root && otherIt.root != "")
         return false
