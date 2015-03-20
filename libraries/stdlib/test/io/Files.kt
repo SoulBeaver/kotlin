@@ -657,7 +657,9 @@ class FilesTest {
         assertEquals(File("/foo/bar/baaz"), File("/foo/./bar/gav/../baaz").normalize())
         assertEquals(File("/foo/bar/baaz"), File("/foo/bak/../bar/gav/../baaz").normalize())
         assertEquals(File("../../bar"), File("../foo/../../bar").normalize())
-        assertEquals(File("C:\\windows"), File("C:\\home\\..\\documents\\..\\windows").normalize())
+        // For Unix C:\windows is not correct so it's not the same as C:/windows
+        assertEquals(File("C:\\windows").separatorsToSystem(),
+                File("C:\\home\\..\\documents\\..\\windows").normalize().separatorsToSystem())
         assertEquals(File("C:/windows"), File("C:/home/../documents/../windows").normalize())
         assertEquals(File("foo"), File("gav/bar/../../foo").normalize())
     }
@@ -666,8 +668,9 @@ class FilesTest {
         assertEquals(File("/foo/bar/gav"), File("/foo/bar").resolve("gav"))
         assertEquals(File("/foo/bar/gav"), File("/foo/bar/").resolve("gav"))
         assertEquals(File("/gav"), File("/foo/bar").resolve("/gav"))
-        assertEquals(File("C:\\Users\\Me\\Documents\\important.doc"),
-                File("C:\\Users\\Me").resolve("Documents\\important.doc"))
+        // For Unix C:\path is not correct so it's cannot be automatically converted
+        assertEquals(File("C:\\Users\\Me\\Documents\\important.doc").separatorsToSystem(),
+                File("C:\\Users\\Me").resolve("Documents\\important.doc").separatorsToSystem())
         assertEquals(File("C:/Users/Me/Documents/important.doc"),
                 File("C:/Users/Me").resolve("Documents/important.doc"))
     }
@@ -676,8 +679,9 @@ class FilesTest {
         assertEquals(File("/foo/gav"), File("/foo/bar").resolveSibling("gav"))
         assertEquals(File("/foo/gav"), File("/foo/bar/").resolveSibling("gav"))
         assertEquals(File("/gav"), File("/foo/bar").resolveSibling("/gav"))
-        assertEquals(File("C:\\Users\\Me\\Documents\\important.doc"),
-                File("C:\\Users\\Me\\profile.ini").resolveSibling("Documents\\important.doc"))
+        // For Unix C:\path is not correct so it's cannot be automatically converted
+        assertEquals(File("C:\\Users\\Me\\Documents\\important.doc").separatorsToSystem(),
+                File("C:\\Users\\Me\\profile.ini").resolveSibling("Documents\\important.doc").separatorsToSystem())
         assertEquals(File("C:/Users/Me/Documents/important.doc"),
                 File("C:/Users/Me/profile.ini").resolveSibling("Documents/important.doc"))
     }
