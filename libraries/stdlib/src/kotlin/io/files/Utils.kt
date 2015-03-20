@@ -303,7 +303,7 @@ public fun File.copyRecursively(dst: File,
  */
 public fun File.deleteRecursively(): Boolean {
     var result = exists()
-    walkBottomUp().forEach { println(it.canonicalPath); if (!it.delete()) result = false }
+    walkBottomUp().forEach { if (!it.delete()) result = false }
     return result
 }
 
@@ -447,7 +447,13 @@ public fun File.resolve(o: String): File = resolve(File(o))
  * @return concatenated this.parent and [o] paths, or just [o] if it's absolute or this has no parent
  */
 public fun File.resolveSibling(o: File): File {
-    val parentFile = parent
+    val components = filePathComponents()
+    val rootName = components.rootName
+    val parentFile = when (components.size) {
+        0 -> null
+        1 -> File(rootName)
+        else -> File(rootName + components.subPath(0, components.size - 1).path)
+    }
     return if (parentFile != null) parentFile.resolve(o) else o
 }
 
