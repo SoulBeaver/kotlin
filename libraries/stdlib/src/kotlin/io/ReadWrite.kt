@@ -278,12 +278,12 @@ public inline fun <T> Reader.useLines(block: (Sequence<String>) -> T): T =
  *
  * @return a sequence of corresponding file lines
  */
-public fun BufferedReader.lines(): Sequence<String> = LinesSequence(this)
+public fun BufferedReader.lines(): Sequence<String> = LinesStream(this)
 
 deprecated("Use lines() function which returns Sequence<String>")
 public fun BufferedReader.lineIterator(): Iterator<String> = lines().iterator()
 
-private class LinesSequence(private val reader: BufferedReader) : Sequence<String> {
+private class LinesStream(private val reader: BufferedReader) : Sequence<String> {
     override fun iterator(): Iterator<String> {
         return object : Iterator<String> {
             private var nextValue: String? = null
