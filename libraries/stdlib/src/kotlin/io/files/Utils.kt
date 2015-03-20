@@ -112,8 +112,8 @@ public fun String.allSeparatorsToSystem(): String {
 /** Creates a new reader for the string */
 public fun String.reader(): StringReader = StringReader(this)
 
-/** Creates a new input stream for the string */
-public fun String.inputStream(charset: Charset = Charsets.UTF_8): InputStream = ByteArrayInputStream(toByteArray(charset))
+/** Creates a new byte input stream for the string */
+public fun String.byteInputStream(charset: Charset = Charsets.UTF_8): InputStream = ByteArrayInputStream(toByteArray(charset))
 
 /**
  * Returns a pathname of this file with all path separators replaced with File.pathSeparator

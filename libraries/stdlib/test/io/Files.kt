@@ -865,7 +865,7 @@ class FilesTest {
 
     test fun helpers1() {
         val str = "123456789\n"
-        System.setIn(str.inputStream())
+        System.setIn(str.byteInputStream())
         val reader = System.`in`.bufferedReader()
         assertEquals("123456789", reader.readLine())
         val stringReader = str.reader()
